@@ -1,0 +1,28 @@
+{
+  "name": "ecommerce-microservices",
+  "version": "1.0.0",
+  "description": "Minimalist clothing ecommerce built with microservices",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "services/gateway",
+    "services/user_service",
+    "services/product_service",
+    "services/cart_service",
+    "services/order_service",
+    "services/payment_service"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:gateway": "npm run dev --workspace=services/gateway",
+    "dev:user": "npm run dev --workspace=services/user_service",
+    "dev:product": "npm run dev --workspace=services/product_service",
+    "dev:cart": "npm run dev --workspace=services/cart_service",
+    "dev:order": "npm run dev --workspace=services/order_service",
+    "dev:payment": "npm run dev --workspace=services/payment_service",
+    "dev:services": "concurrently \"npm run dev:gateway\" \"npm run dev:user\" \"npm run dev:product\" \"npm run dev:cart\" \"npm run dev:order\" \"npm run dev:payment\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
