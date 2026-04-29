@@ -1,0 +1,145 @@
+version: '3.8'
+
+services:
+  # Infrastructure
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+
+  # Microservices
+  gateway:
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - USER_SERVICE_URL=http://user_service:3001
+      - PRODUCT_SERVICE_URL=http://product_service:3002
+      - CART_SERVICE_URL=http://cart_service:3003
+      - ORDER_SERVICE_URL=http://order_service:3004
+      - PAYMENT_SERVICE_URL=http://payment_service:3005
+    depends_on:
+      - user_service
+      - product_service
+      - cart_service
+      - order_service
+      - payment_service
+
+  user_service:
+    build:
+      context: ./services/user_service
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/user_db
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
+      - JWT_SECRET=${JWT_SECRET:-supersecretjwtkeyforlocaldev}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+
+  product_service:
+    build:
+      context: ./services/product_service
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3002
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/product_db
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
+    volumes:
+      - product_images:/app/images
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+
+  cart_service:
+    build:
+      context: ./services/cart_service
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3003
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+
+  order_service:
+    build:
+      context: ./services/order_service
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3004
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/order_db
+      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  payment_service:
+    build:
+      context: ./services/payment_service
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3005
+      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+    depends_on:
+      rabbitmq:
+        condition: service_started
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - gateway
+
+volumes:
+  postgres_data:
+  product_images:

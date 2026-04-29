@@ -8,7 +8,7 @@ const Navbar = ({ cartCount }) => {
   const handleProfileClick = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:3000/api/users/me', {
+      const res = await fetch('/api/users/me', {
         credentials: 'include'
       });
       if (res.ok) {

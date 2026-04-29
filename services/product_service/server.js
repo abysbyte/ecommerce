@@ -2,6 +2,8 @@ require('dotenv').config({ path: '../../.env' });
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 
 const { PrismaClient } = require('./prisma/client');
 
@@ -9,6 +11,27 @@ const prisma = new PrismaClient();
 const app = express();
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
+
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_admin_key';
+
+// Middleware to verify JWT and admin role
+const authMiddleware = (req, res, next) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+};
 
 // Serve static product images
 app.use('/images', express.static(path.join(__dirname, 'images')));
@@ -31,7 +54,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-app.post('/api/products/upload', upload.single('image'), (req, res) => {
+app.post('/api/products/upload', authMiddleware, upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No image file uploaded' });
   }
@@ -67,7 +90,6 @@ const seedProducts = async () => {
 app.get('/api/products', async (req, res) => {
   try {
     const products = await prisma.product.findMany();
-    // Emulating Cache delay or just fast return if Redis isn't connected
     res.json(products);
   } catch (error) {
     console.error(error);
@@ -75,10 +97,26 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// Admin API: Create a new product
-app.post('/api/products', async (req, res) => {
+// Admin API: Create a new product (Protected)
+app.post('/api/products', authMiddleware, async (req, res) => {
   try {
-    const newProduct = await prisma.product.create({ data: req.body });
+    const { name, brand, price, category, size, color, imageUrl } = req.body;
+    
+    if (!name || !brand || !price || !category || !size || !color) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const newProduct = await prisma.product.create({
+      data: {
+        name,
+        brand,
+        price: parseFloat(price),
+        category,
+        size,
+        color,
+        imageUrl: imageUrl || null
+      }
+    });
     res.status(201).json(newProduct);
   } catch (error) {
     console.error(error);
@@ -86,12 +124,26 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-// Admin API: Update an existing product by ID
-app.put('/api/products/:id', async (req, res) => {
+// Admin API: Update an existing product by ID (Protected)
+app.put('/api/products/:id', authMiddleware, async (req, res) => {
   try {
+    const { name, brand, price, category, size, color, imageUrl } = req.body;
+    
+    if (!name || !brand || !price || !category || !size || !color) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
     const updatedProduct = await prisma.product.update({
       where: { id: parseInt(req.params.id) },
-      data: req.body,
+      data: {
+        name,
+        brand,
+        price: parseFloat(price),
+        category,
+        size,
+        color,
+        imageUrl: imageUrl || null
+      }
     });
     res.json(updatedProduct);
   } catch (error) {
@@ -100,11 +152,11 @@ app.put('/api/products/:id', async (req, res) => {
   }
 });
 
-// Admin API: Delete a product by ID
-app.delete('/api/products/:id', async (req, res) => {
+// Admin API: Delete a product by ID (Protected)
+app.delete('/api/products/:id', authMiddleware, async (req, res) => {
   try {
     await prisma.product.delete({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id) }
     });
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {

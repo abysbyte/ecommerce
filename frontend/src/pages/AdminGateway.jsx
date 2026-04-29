@@ -15,7 +15,7 @@ export const AdminGateway = () => {
     e.preventDefault();
     try {
       if (mode === 'login') {
-        const res = await fetch('http://localhost:3000/api/users/login', {
+        const res = await fetch('/api/users/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
@@ -27,7 +27,7 @@ export const AdminGateway = () => {
         
         navigate('/admin/dashboard');
       } else {
-        const res = await fetch('http://localhost:3000/api/users/admin-signup', {
+        const res = await fetch('/api/users/admin-signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, password, adminSecret }),

@@ -11,7 +11,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/users/me', { credentials: 'include' });
+        const res = await fetch('/api/users/me', { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           setUser(data);
@@ -28,7 +28,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:3000/api/users/logout', { method: 'POST', credentials: 'include' });
+      await fetch('/api/users/logout', { method: 'POST', credentials: 'include' });
       navigate('/');
     } catch (err) {
       console.error('Logout failed', err);
@@ -39,7 +39,7 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       setError('');
-      const res = await fetch('http://localhost:3000/api/users/profile', {
+      const res = await fetch('/api/users/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm),

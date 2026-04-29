@@ -17,7 +17,7 @@ const AdminDashboard = () => {
 
   // Verify Admin Session via Cookie
   useEffect(() => {
-    fetch('http://localhost:3000/api/users/me', { credentials: 'include' })
+    fetch('/api/users/me', { credentials: 'include' })
       .then(res => {
         if (!res.ok) throw new Error('Not authorized');
         return res.json();
@@ -77,11 +77,13 @@ const AdminDashboard = () => {
       const res = await fetch('http://localhost:3002/api/products/upload', {
         method: 'POST',
         body: data,
+        credentials: 'include'
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Failed to upload');
       
       setFormData(prev => ({ ...prev, imageUrl: result.imageUrl }));
+      alert('Image uploaded successfully');
     } catch (err) {
       console.error(err);
       alert('Upload failed: ' + err.message);
@@ -93,14 +95,32 @@ const AdminDashboard = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
-      await fetch(`http://localhost:3002/api/products/${id}`, {
+      const res = await fetch(`http://localhost:3002/api/products/${id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to delete product');
+      }
       fetchProducts();
+      alert("Product deleted successfully");
     } catch (err) {
       console.error(err);
-      alert("Failed to delete product");
+      alert("Failed to delete product: " + err.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/users/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout error:', err);
+      navigate('/login');
     }
   };
 
@@ -119,6 +139,13 @@ const AdminDashboard = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (!formData.name || !formData.brand || !formData.price || !formData.category || !formData.size || !formData.color) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
     try {
       const url = editingId ? `http://localhost:3002/api/products/${editingId}` : 'http://localhost:3002/api/products';
       const method = editingId ? 'PUT' : 'POST';
@@ -128,19 +155,25 @@ const AdminDashboard = () => {
         price: parseFloat(formData.price)
       };
 
-      await fetch(url, {
+      const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
         credentials: 'include'
       });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to save product');
+      }
       
       setEditingId(null);
       setFormData({ name: '', brand: '', price: '', category: '', size: '', color: '', imageUrl: '' });
       fetchProducts();
+      alert(editingId ? 'Product updated successfully' : 'Product created successfully');
     } catch (err) {
       console.error(err);
-      alert("Failed to save product");
+      alert("Failed to save product: " + err.message);
     }
   };
 
@@ -151,10 +184,13 @@ const AdminDashboard = () => {
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h1 style={{ color: 'var(--blue)' }}>Admin Dashboard</h1>
-        <button className="btn" onClick={() => {
-            setEditingId(null);
-            setFormData({ name: '', brand: '', price: '', category: '', size: '', color: '', imageUrl: '' });
-        }}>+ New Product</button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button className="btn" onClick={() => {
+              setEditingId(null);
+              setFormData({ name: '', brand: '', price: '', category: '', size: '', color: '', imageUrl: '' });
+          }}>+ New Product</button>
+          <button className="btn" style={{ background: '#1c64f2', color: 'white', borderColor: '#ff6b6b' }} onClick={handleLogout}>Logout</button>
+        </div>
       </header>
 
       {/* Product Form */}

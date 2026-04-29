@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Cart = ({ items }) => {
+const Cart = ({ items, onRemoveFromCart, onClearCart }) => {
   const total = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   if (items.length === 0) {
@@ -25,13 +25,31 @@ const Cart = ({ items }) => {
               <div style={{ width: '120px', height: '160px', overflow: 'hidden', background: 'var(--bg-secondary)' }}>
                 <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <span className="product-brand">{item.brand}</span>
-                <h4 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{item.name}</h4>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>Size: {item.size}</p>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <span className="product-brand">{item.brand}</span>
+                  <h4 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{item.name}</h4>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>Size: {item.size}</p>
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>Qty: {item.quantity}</span>
-                  <span style={{ fontWeight: 500 }}>₹{(item.price * item.quantity).toFixed(2)}</span>
+                  <div>
+                    <span style={{ marginRight: '1.5rem' }}>Qty: {item.quantity}</span>
+                    <span style={{ fontWeight: 500 }}>₹{(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                  <button 
+                    onClick={() => onRemoveFromCart(item.id)}
+                    style={{ 
+                      background: '#ff6b6b', 
+                      color: 'white', 
+                      border: 'none', 
+                      padding: '0.5rem 1rem', 
+                      cursor: 'pointer',
+                      borderRadius: '4px',
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    Remove
+                  </button>
                 </div>
               </div>
             </div>
@@ -53,6 +71,21 @@ const Cart = ({ items }) => {
             <span>₹{total.toFixed(2)}</span>
           </div>
           <button className="btn btn-primary" style={{ width: '100%', marginTop: '2rem' }}>Proceed to Checkout</button>
+          <button 
+            onClick={onClearCart}
+            style={{ 
+              width: '100%', 
+              marginTop: '1rem',
+              background: '#e9ecef',
+              border: '1px solid #dee2e6',
+              padding: '0.75rem',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '1rem'
+            }}
+          >
+            Clear Cart
+          </button>
         </div>
       </div>
     </div>
