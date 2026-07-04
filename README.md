@@ -142,40 +142,6 @@ graph TD
 
 ---
 
-## ⚙️ Environment Variables
-
-A `.env` file should be located at the root of the project.
-
-```env
-# Gateway Configuration
-PORT_GATEWAY=3000
-
-# Microservices Local Ports
-PORT_USER=3001
-PORT_PRODUCT=3002
-PORT_CART=3003
-PORT_ORDER=3004
-PORT_PAYMENT=3005
-
-# PostgreSQL Connection URLs (Local/Docker mapping)
-DATABASE_URL_USER="postgresql://postgres:password@localhost:5433/user_db"
-DATABASE_URL_PRODUCT="postgresql://postgres:password@localhost:5433/product_db"
-DATABASE_URL_ORDER="postgresql://postgres:password@localhost:5433/order_db"
-
-# Caching
-REDIS_URL="redis://localhost:6379"
-
-# Messaging Queue
-RABBITMQ_URL="amqp://user:password@localhost:5672"
-
-# Security
-JWT_SECRET="supersecretjwtkeyforlocaldev"
-
-# Stripe API Keys (For Payments)
-STRIPE_SECRET_KEY="sk_test_..."
-```
-
----
 
 ## 🚀 Running the Project
 
