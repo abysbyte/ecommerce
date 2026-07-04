@@ -35,7 +35,7 @@ const Navbar = ({ cartCount }) => {
         </div>
       </div>
       <div className="nav-center">
-        <Link to="/">Apocalypse</Link>
+        <Link to="/">FASHION APOCALYPSE</Link>
       </div>
       <div className="nav-right">
         <Link to="/cart">CART ({cartCount})</Link>
