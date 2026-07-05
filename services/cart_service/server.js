@@ -116,5 +116,5 @@ app.delete('/', authMiddleware, async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT_CART || 3003;
+const PORT = process.env.PORT || process.env.PORT_CART || 3003;
 app.listen(PORT, () => console.log(`Cart Service running on port ${PORT}`));

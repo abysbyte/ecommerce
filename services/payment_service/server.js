@@ -8,5 +8,5 @@ app.use(express.json());
 
 app.get('/health', (req, res) => res.json({ status: 'Payment Service UP' }));
 
-const PORT = process.env.PORT_PAYMENT || 3005;
+const PORT = process.env.PORT || process.env.PORT_PAYMENT || 3005;
 app.listen(PORT, () => console.log(`Payment Service running on port ${PORT}`));

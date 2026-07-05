@@ -373,5 +373,5 @@ app.post('/logout', authenticateToken, async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT_USER || 3001;
+const PORT = process.env.PORT || process.env.PORT_USER || 3001;
 app.listen(PORT, () => console.log(`User Service running on port ${PORT}`));

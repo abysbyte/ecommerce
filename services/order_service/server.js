@@ -8,5 +8,5 @@ app.use(express.json());
 
 app.get('/health', (req, res) => res.json({ status: 'Order Service UP' }));
 
-const PORT = process.env.PORT_ORDER || 3004;
+const PORT = process.env.PORT || process.env.PORT_ORDER || 3004;
 app.listen(PORT, () => console.log(`Order Service running on port ${PORT}`));

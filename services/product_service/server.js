@@ -58,7 +58,9 @@ app.post('/upload', authMiddleware, upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No image file uploaded' });
   }
-  const imageUrl = `http://localhost:${process.env.PORT_PRODUCT || 3002}/images/${req.file.filename}`;
+  const port = process.env.PORT || process.env.PORT_PRODUCT || 3002;
+  const baseUrl = process.env.PRODUCT_SERVICE_URL || `http://localhost:${port}`;
+  const imageUrl = `${baseUrl}/images/${req.file.filename}`;
   res.json({ imageUrl });
 });
 
@@ -165,7 +167,7 @@ app.delete('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT_PRODUCT || 3002;
+const PORT = process.env.PORT || process.env.PORT_PRODUCT || 3002;
 app.listen(PORT, async () => {
   await seedProducts();
   console.log(`Product Service running on port ${PORT}`);
