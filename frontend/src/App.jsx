@@ -11,27 +11,37 @@ function App() {
   const [cartItems, setCartItems] = useState([]);
   const [userId, setUserId] = useState(null);
 
-  // Load cart from backend on mount or when user logs in
-  useEffect(() => {
-    const checkUserAndLoadCart = async () => {
-      try {
-        const userRes = await fetch('/api/users/me', { credentials: 'include' });
-        if (userRes.ok) {
-          const userData = await userRes.json();
-          setUserId(userData.id);
-          
-          // Load cart from backend
-          const cartRes = await fetch('/api/cart', { credentials: 'include' });
-          if (cartRes.ok) {
-            const cart = await cartRes.json();
-            setCartItems(cart);
-          }
+  const checkUserAndLoadCart = async () => {
+    try {
+      const userRes = await fetch('/api/users/me', { credentials: 'include' });
+      if (userRes.ok) {
+        const userData = await userRes.json();
+        setUserId(userData.id);
+        
+        // Load cart from backend
+        const cartRes = await fetch('/api/cart', { credentials: 'include' });
+        if (cartRes.ok) {
+          const cart = await cartRes.json();
+          setCartItems(cart);
         }
-      } catch (err) {
-        console.error('Error loading user/cart:', err);
+      } else {
+        setUserId(null);
+        setCartItems([]);
       }
-    };
-    
+    } catch (err) {
+      console.error('Error loading user/cart:', err);
+      setUserId(null);
+      setCartItems([]);
+    }
+  };
+
+  const handleLogoutSuccess = () => {
+    setUserId(null);
+    setCartItems([]);
+  };
+
+  // Load cart from backend on mount
+  useEffect(() => {
     checkUserAndLoadCart();
   }, []);
 
@@ -98,11 +108,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Catalog onAddToCart={addToCart} />} />
         <Route path="/cart" element={<Cart items={cartItems} onRemoveFromCart={removeFromCart} onClearCart={clearCart} />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/login" element={<Login onLoginSuccess={checkUserAndLoadCart} />} />
+        <Route path="/signup" element={<Signup onLoginSuccess={checkUserAndLoadCart} />} />
+        <Route path="/profile" element={<Profile onLogoutSuccess={handleLogoutSuccess} />} />
         {/* Admin Routes */}
-        <Route path="/admin-portal" element={<AdminLogin />} />        <Route path="/admin/create-user" element={<AdminCreateUser />} />        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin-portal" element={<AdminLogin onLoginSuccess={checkUserAndLoadCart} />} />        <Route path="/admin/create-user" element={<AdminCreateUser onLoginSuccess={checkUserAndLoadCart} />} />        <Route path="/admin/dashboard" element={<AdminDashboard onLogoutSuccess={handleLogoutSuccess} />} />
       </Routes>
     </Router>
   );

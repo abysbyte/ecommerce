@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ onLogoutSuccess }) => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [authChecked, setAuthChecked] = useState(false);
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
   }, [navigate]);
 
   const fetchProducts = () => {
-    fetch('http://localhost:3002/api/products')
+    fetch('/api/products')
       .then(res => res.json())
       .then(data => setProducts(data))
       .catch(err => console.error("Error fetching products:", err));
@@ -74,7 +74,7 @@ const AdminDashboard = () => {
     data.append('image', file);
 
     try {
-      const res = await fetch('http://localhost:3002/api/products/upload', {
+      const res = await fetch('/api/products/upload', {
         method: 'POST',
         body: data,
         credentials: 'include'
@@ -95,7 +95,7 @@ const AdminDashboard = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
-      const res = await fetch(`http://localhost:3002/api/products/${id}`, {
+      const res = await fetch(`/api/products/${id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -117,6 +117,7 @@ const AdminDashboard = () => {
         method: 'POST',
         credentials: 'include'
       });
+      if (onLogoutSuccess) onLogoutSuccess();
       navigate('/login');
     } catch (err) {
       console.error('Logout error:', err);
@@ -147,7 +148,7 @@ const AdminDashboard = () => {
     }
 
     try {
-      const url = editingId ? `http://localhost:3002/api/products/${editingId}` : 'http://localhost:3002/api/products';
+      const url = editingId ? `/api/products/${editingId}` : '/api/products';
       const method = editingId ? 'PUT' : 'POST';
       
       const payload = {
@@ -185,11 +186,11 @@ const AdminDashboard = () => {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h1 style={{ color: 'var(--blue)' }}>Admin Dashboard</h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <button className="btn" onClick={() => {
+          <button className="btn btn-primary" onClick={() => {
               setEditingId(null);
               setFormData({ name: '', brand: '', price: '', category: '', size: '', color: '', imageUrl: '' });
           }}>+ New Product</button>
-          <button className="btn" style={{ background: '#1c64f2', color: 'white', borderColor: '#ff6b6b' }} onClick={handleLogout}>Logout</button>
+          <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
         </div>
       </header>
 
@@ -258,7 +259,7 @@ const AdminDashboard = () => {
               <td style={{ padding: '1rem' }}>₹{p.price}</td>
               <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem' }}>
                 <button className="btn" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={() => handleEdit(p)}>Edit</button>
-                <button className="btn" style={{ background: 'red', color: 'white', borderColor: 'red', padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={() => handleDelete(p.id)}>Delete</button>
+                <button className="btn btn-danger" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={() => handleDelete(p.id)}>Delete</button>
               </td>
             </tr>
           ))}

@@ -12,7 +12,7 @@ const ProductCard = ({ product, onAdd }) => (
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="product-name">{product.name}</div>
-        <button onClick={() => onAdd(product)} style={{ background: 'var(--blue)', color: 'var(--white)', border: 'none', padding: '0.25rem 0.75rem', fontWeight: 900, fontSize: '0.75rem', cursor: 'pointer' }}>+ CART</button>
+        <button onClick={() => onAdd(product)} className="btn-cart">+ CART</button>
       </div>
     </div>
   </div>
@@ -49,7 +49,7 @@ const ProductCarousel = ({ items, onAdd }) => {
 
   return (
     <div style={{ position: 'relative' }}>
-      <button onClick={prevSlide} className="btn" style={{ position: 'absolute', left: '-1.5rem', top: '35%', zIndex: 10, padding: '0.75rem 1rem', borderRadius: '50%', background: 'var(--blue)', color: 'white', border: 'none', cursor: 'pointer', boxShadow: '4px 4px 0px var(--black)' }}>&larr;</button>
+      <button onClick={prevSlide} className="btn-carousel" style={{ left: '-1.5rem' }}>&larr;</button>
       <div style={{ overflow: 'hidden', padding: '1rem 0' }}>
         <div style={{ 
           display: 'flex', 
@@ -63,7 +63,7 @@ const ProductCarousel = ({ items, onAdd }) => {
           ))}
         </div>
       </div>
-      <button onClick={nextSlide} className="btn" style={{ position: 'absolute', right: '-1.5rem', top: '35%', zIndex: 10, padding: '0.75rem 1rem', borderRadius: '50%', background: 'var(--blue)', color: 'white', border: 'none', cursor: 'pointer', boxShadow: '4px 4px 0px var(--black)' }}>&rarr;</button>
+      <button onClick={nextSlide} className="btn-carousel" style={{ right: '-1.5rem' }}>&rarr;</button>
     </div>
   );
 };
@@ -73,7 +73,7 @@ const Catalog = ({ onAddToCart }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:3002/api/products')
+    fetch('/api/products')
       .then(res => {
         if (!res.ok) throw new Error(`Server error: ${res.statusText}`);
         return res.json();

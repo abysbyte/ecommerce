@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const Profile = () => {
+const Profile = ({ onLogoutSuccess }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -29,6 +29,7 @@ const Profile = () => {
   const handleLogout = async () => {
     try {
       await fetch('/api/users/logout', { method: 'POST', credentials: 'include' });
+      if (onLogoutSuccess) onLogoutSuccess();
       navigate('/');
     } catch (err) {
       console.error('Logout failed', err);
@@ -60,7 +61,7 @@ const Profile = () => {
     <div className="section-wrapper" style={{ maxWidth: '800px', margin: '0 auto', minHeight: '80vh' }}>
       <header className="section-header" style={{ borderBottom: '4px solid var(--black)', paddingBottom: '1rem', marginBottom: '3rem' }}>
         <h2 className="section-title" style={{ fontSize: '3rem' }}>MY PROFILE</h2>
-        <button onClick={handleLogout} className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', cursor: 'pointer' }}>LOG OUT</button>
+        <button onClick={handleLogout} className="btn btn-danger" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>LOG OUT</button>
       </header>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '4rem' }}>
@@ -82,15 +83,15 @@ const Profile = () => {
                 <input type="email" value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '2px solid var(--black)' }} />
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button className="btn btn-primary" onClick={handleSave} style={{ flex: 1, padding: '0.75rem', cursor: 'pointer', background: 'var(--blue)', color: 'white', border: 'none' }}>SAVE</button>
-                <button className="btn" onClick={() => setIsEditing(false)} style={{ flex: 1, padding: '0.75rem', cursor: 'pointer', background: 'transparent', color: 'var(--black)', border: '2px solid var(--black)' }}>CANCEL</button>
+                <button className="btn btn-primary" onClick={handleSave} style={{ flex: 1 }}>SAVE</button>
+                <button className="btn" onClick={() => setIsEditing(false)} style={{ flex: 1 }}>CANCEL</button>
               </div>
             </div>
           ) : (
             <>
               <h3 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase' }}>{user.name}</h3>
               <p style={{ fontSize: '0.85rem', color: '#666', fontWeight: 600, marginBottom: '2rem', textTransform: 'uppercase' }}>{user.email}</p>
-              <button className="btn" onClick={() => setIsEditing(true)} style={{ width: '100%', padding: '0.75rem', cursor: 'pointer' }}>EDIT PROFILE</button>
+              <button className="btn" onClick={() => setIsEditing(true)} style={{ width: '100%' }}>EDIT PROFILE</button>
             </>
           )}
         </div>

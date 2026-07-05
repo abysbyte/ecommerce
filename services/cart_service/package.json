@@ -12,7 +12,7 @@
     "dotenv": "^16.4.5",
     "redis": "^4.6.13",
     "cookie-parser": "^1.4.6",
-    "jsonwebtoken": "^9.1.2"
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

@@ -54,7 +54,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-app.post('/api/products/upload', authMiddleware, upload.single('image'), (req, res) => {
+app.post('/upload', authMiddleware, upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No image file uploaded' });
   }
@@ -87,7 +87,7 @@ const seedProducts = async () => {
   }
 };
 
-app.get('/api/products', async (req, res) => {
+app.get('/', async (req, res) => {
   try {
     const products = await prisma.product.findMany();
     res.json(products);
@@ -98,7 +98,7 @@ app.get('/api/products', async (req, res) => {
 });
 
 // Admin API: Create a new product (Protected)
-app.post('/api/products', authMiddleware, async (req, res) => {
+app.post('/', authMiddleware, async (req, res) => {
   try {
     const { name, brand, price, category, size, color, imageUrl } = req.body;
     
@@ -125,7 +125,7 @@ app.post('/api/products', authMiddleware, async (req, res) => {
 });
 
 // Admin API: Update an existing product by ID (Protected)
-app.put('/api/products/:id', authMiddleware, async (req, res) => {
+app.put('/:id', authMiddleware, async (req, res) => {
   try {
     const { name, brand, price, category, size, color, imageUrl } = req.body;
     
@@ -153,7 +153,7 @@ app.put('/api/products/:id', authMiddleware, async (req, res) => {
 });
 
 // Admin API: Delete a product by ID (Protected)
-app.delete('/api/products/:id', authMiddleware, async (req, res) => {
+app.delete('/:id', authMiddleware, async (req, res) => {
   try {
     await prisma.product.delete({
       where: { id: parseInt(req.params.id) }

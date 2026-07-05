@@ -13,6 +13,8 @@
     "services/payment_service"
   ],
   "scripts": {
+    "start": "concurrently \"npm run start --workspace=services/gateway\" \"npm run start --workspace=services/user_service\" \"npm run start --workspace=services/product_service\" \"npm run start --workspace=services/cart_service\" \"npm run start --workspace=services/order_service\" \"npm run start --workspace=services/payment_service\"",
+    "build:backend": "npx prisma generate --schema=services/user_service/prisma/schema.prisma && npx prisma generate --schema=services/product_service/prisma/schema.prisma && npx prisma generate --schema=services/order_service/prisma/schema.prisma",
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:gateway": "npm run dev --workspace=services/gateway",
     "dev:user": "npm run dev --workspace=services/user_service",
@@ -22,7 +24,7 @@
     "dev:payment": "npm run dev --workspace=services/payment_service",
     "dev:services": "concurrently \"npm run dev:gateway\" \"npm run dev:user\" \"npm run dev:product\" \"npm run dev:cart\" \"npm run dev:order\" \"npm run dev:payment\""
   },
-  "devDependencies": {
+  "dependencies": {
     "concurrently": "^9.2.1"
   }
 }

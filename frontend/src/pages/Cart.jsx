@@ -38,15 +38,8 @@ const Cart = ({ items, onRemoveFromCart, onClearCart }) => {
                   </div>
                   <button 
                     onClick={() => onRemoveFromCart(item.id)}
-                    style={{ 
-                      background: '#ff6b6b', 
-                      color: 'white', 
-                      border: 'none', 
-                      padding: '0.5rem 1rem', 
-                      cursor: 'pointer',
-                      borderRadius: '4px',
-                      fontSize: '0.9rem'
-                    }}
+                    className="btn btn-danger"
+                    style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
                   >
                     Remove
                   </button>
@@ -73,16 +66,8 @@ const Cart = ({ items, onRemoveFromCart, onClearCart }) => {
           <button className="btn btn-primary" style={{ width: '100%', marginTop: '2rem' }}>Proceed to Checkout</button>
           <button 
             onClick={onClearCart}
-            style={{ 
-              width: '100%', 
-              marginTop: '1rem',
-              background: '#e9ecef',
-              border: '1px solid #dee2e6',
-              padding: '0.75rem',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '1rem'
-            }}
+            className="btn btn-secondary"
+            style={{ width: '100%', marginTop: '1rem' }}
           >
             Clear Cart
           </button>
